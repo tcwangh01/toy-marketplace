@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import NavigationBar from "@/components/NavigationBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -205,6 +206,26 @@ const CreateListingForm = () => {
     }
   };
 
+  const PROFANITY_LIST = ["fuck", "merder", "merde", "shit", "asshole", "bastard", "bitch", "cunt", "damn", "piss"];
+
+  const checkForProfanity = (fields: Record<string, string>) => {
+    for (const [field, value] of Object.entries(fields)) {
+      const lower = value.toLowerCase();
+      for (const word of PROFANITY_LIST) {
+        if (new RegExp(`\\b${word}\\b`, "i").test(lower)) {
+          Sentry.captureMessage(`Profanity detected in listing field "${field}"`, {
+            level: "warning",
+            extra: {
+              field,
+              matchedWord: word,
+              userId: user?.id,
+            },
+          });
+        }
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -214,6 +235,15 @@ const CreateListingForm = () => {
         toast({ title: "Please sign in", description: "You must be logged in to publish.", variant: "destructive" });
         return;
       }
+
+      checkForProfanity({
+        productName,
+        description,
+        color,
+        leather,
+        stamp,
+        location,
+      });
 
       const priceNumber = Number(price);
       const yearNumber = parseInt(yearPurchased, 10);
