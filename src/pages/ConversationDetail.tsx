@@ -39,6 +39,7 @@ const ConversationDetail = () => {
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -309,22 +310,41 @@ const ConversationDetail = () => {
   }, [messages, user]);
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !conversationId || !user) return;
+    if (!newMessage.trim() || !conversationId || !user || isSending) return;
+
+    setIsSending(true);
+    const body = newMessage.trim();
+    setNewMessage("");
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('messages')
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
-          body: newMessage.trim()
-        });
+          body,
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      setNewMessage("");
-      
-      // Auto-scroll to bottom after sending message
+      // Add to local state immediately; realtime dedup prevents double-add
+      const sent: Message = {
+        id: data.id,
+        sender_id: data.sender_id,
+        body: data.body,
+        created_at: data.created_at,
+        is_read: true,
+        read_at: new Date().toISOString(),
+      };
+      setMessages(prev => {
+        if (prev.some(m => m.id === sent.id)) return prev;
+        return [...prev, sent].sort((a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      });
+
       setTimeout(() => {
         const messagesContainer = document.querySelector('.overflow-y-auto');
         if (messagesContainer) {
@@ -332,15 +352,16 @@ const ConversationDetail = () => {
         }
         messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
       }, 100);
-      
-      // No need to fetchMessages() - realtime subscription will handle it
     } catch (error) {
       console.error('Error sending message:', error);
+      setNewMessage(body);
       toast({
         title: "Error",
         description: "Failed to send message",
         variant: "destructive",
       });
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -626,7 +647,7 @@ const ConversationDetail = () => {
           {/* Send Button */}
           <Button
             onClick={sendMessage}
-            disabled={!newMessage.trim()}
+            disabled={!newMessage.trim() || isSending}
             className="bg-primary text-white hover:bg-primary/90 font-orator h-11 px-6 rounded-full disabled:opacity-50 min-w-[68px]"
           >
             Send
