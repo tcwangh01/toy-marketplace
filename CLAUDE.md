@@ -102,3 +102,11 @@ All tables use RLS. Business logic (read counts, save toggles, public product li
 ### Pending work
 
 Image upload in conversations is not yet implemented (noted in `README_TODO.md`).
+
+## Known Gotchas
+
+### Stale browser session after `supabase db reset`
+`db reset` wipes `auth.users` entirely (there is no seed user). If the browser's localStorage still holds a JWT from the previous DB, `user.id` in the app will reference a now-dead UUID. Any insert that touches the `products_user_fk` (`products.user_id → profiles.user_id`) will fail with a foreign key constraint error. Fix: sign out and sign back in on the local instance after every reset.
+
+### RLS policies alone are not enough — table GRANTs are also required
+RLS policies control row visibility, but PostgreSQL also requires explicit `GRANT SELECT/INSERT/...` on each table for the `anon` and `authenticated` roles. Any new table added in a migration must include these grants or direct Supabase client queries (`.from("table")`) will return `permission denied`. RPCs with `SECURITY DEFINER` bypass this and work without table grants. See `supabase/migrations/20250909060000_grant_table_permissions.sql` for the pattern.
