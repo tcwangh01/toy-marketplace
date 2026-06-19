@@ -1,0 +1,33 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e72]:
+    - banner [ref=e73]:
+      - button [ref=e74] [cursor=pointer]:
+        - img
+      - button "Marketplace Logo" [ref=e76] [cursor=pointer]:
+        - img "Marketplace Logo" [ref=e77]
+      - generic [ref=e78]:
+        - button [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]:
+            - img
+        - button [ref=e81] [cursor=pointer]:
+          - img
+    - main [ref=e83]:
+      - link "+ Create listing" [ref=e85] [cursor=pointer]:
+        - /url: /create-listing/new
+        - button "+ Create listing" [ref=e86]:
+          - img
+          - text: + Create listing
+      - generic [ref=e88]:
+        - heading "Overview" [level=1] [ref=e89]
+        - paragraph [ref=e90]: Your active listings
+      - generic [ref=e92] [cursor=pointer]:
+        - img "Toy BullDozer" [ref=e96]
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - heading "Toy BullDozer" [level=3] [ref=e99]
+            - link "Edit" [ref=e100]:
+              - /url: /create-listing/edit/33347b9f-4fb8-4e6c-bc3b-28afe61af5fe
+          - generic [ref=e101]: $45

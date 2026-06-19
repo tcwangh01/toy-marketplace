@@ -1,0 +1,50 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - button [ref=e5] [cursor=pointer]:
+        - img
+      - button "Marketplace Logo" [ref=e7] [cursor=pointer]:
+        - img "Marketplace Logo" [ref=e8]
+      - generic [ref=e9]:
+        - button [ref=e10] [cursor=pointer]:
+          - generic [ref=e11]:
+            - img
+        - button [ref=e12] [cursor=pointer]:
+          - img
+    - generic [ref=e14]:
+      - heading "Account" [level=1] [ref=e16]
+      - generic [ref=e17]:
+        - heading "Profile information" [level=2] [ref=e19]
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - generic [ref=e22]: Name
+            - generic [ref=e23]: Jasper Holloway
+          - generic [ref=e24]:
+            - generic [ref=e25]: E-mail
+            - generic [ref=e26]: jasper.holloway.7423@mailtest.dev
+          - generic [ref=e27]:
+            - generic [ref=e28]: Password
+            - generic [ref=e29]: "**********"
+      - generic [ref=e30]:
+        - heading "Activity" [level=2] [ref=e31]
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e34]: You have (0) listings
+            - link "View listings" [ref=e35] [cursor=pointer]:
+              - /url: /create-listing
+          - generic [ref=e36]:
+            - generic [ref=e37]: You have (0) unread messages
+            - link "View messages" [ref=e38] [cursor=pointer]:
+              - /url: /messages
+          - generic [ref=e39]:
+            - generic [ref=e40]: You have (0) saved products
+            - link "View all saved products" [ref=e41] [cursor=pointer]:
+              - /url: /saved-items
+      - generic [ref=e42]:
+        - link "Return Home" [ref=e43] [cursor=pointer]:
+          - /url: /
+          - button "Return Home" [ref=e44]
+        - button "Sign Out" [ref=e45] [cursor=pointer]
