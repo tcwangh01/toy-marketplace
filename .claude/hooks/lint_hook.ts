@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/// <reference types="node" />
 /**
  * Claude Code Pre-Tool Use Hook: Linting Before Commits
  * Project-specific hook that intercepts git commit commands and runs linting first.
