@@ -18,6 +18,7 @@ import { ProductWithImage } from "@/hooks/useUserProducts";
 const CreateListingForm = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<{id: string, url: string}[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [sampleImageFile, setSampleImageFile] = useState<File | null>(null);
   const [productName, setProductName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
@@ -276,6 +277,17 @@ const CreateListingForm = () => {
         }
         
         productId = params.id!;
+
+        // Delete images that were removed by the user
+        if (removedImageIds.length > 0) {
+          const { error: deleteError } = await supabase
+            .from("product_images")
+            .delete()
+            .in("id", removedImageIds);
+          if (deleteError) {
+            console.error("Failed to delete removed images:", deleteError);
+          }
+        }
       } else {
         // Insert new product
         const { data: productData, error: insertError } = await supabase
@@ -352,6 +364,7 @@ const CreateListingForm = () => {
       // Clear form
       setSelectedImages([]);
       setExistingImages([]);
+      setRemovedImageIds([]);
       setProductName("");
       setPrice("");
       setColor("");
@@ -410,6 +423,7 @@ const CreateListingForm = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
+                          setRemovedImageIds(prev => [...prev, image.id]);
                           setExistingImages(prev => prev.filter((_, i) => i !== index));
                         }}
                         className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs font-bold"
