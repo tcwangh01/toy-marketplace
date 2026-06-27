@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/// <reference types="node" />
 /**
  * Claude Code PostToolUse Hook: Automatic Test Runner
  * Runs tests automatically when source code files are modified
@@ -7,10 +8,14 @@
 import { readFileSync, appendFileSync } from 'fs';
 import { execSync } from 'child_process';
 
+interface ToolInput {
+  file_path?: string;
+}
+
 interface HookInput {
   tool_name: string;
-  tool_input: any;
-  tool_output: any;
+  tool_input: ToolInput;
+  tool_output: unknown;
   success: boolean;
 }
 
@@ -31,7 +36,7 @@ function isSourceCodeFile(filePath: string): boolean {
   return isInSrc && hasCodeExtension && isNotTestFile;
 }
 
-function wasSourceCodeModified(toolInput: any): boolean {
+function wasSourceCodeModified(toolInput: ToolInput): boolean {
   const filePath = toolInput.file_path || '';
   return isSourceCodeFile(filePath);
 }
@@ -101,8 +106,9 @@ function runTests(testCommand: string): { success: boolean; output: string } {
     });
 
     return { success: true, output };
-  } catch (error: any) {
-    const output = error.stdout || error.stderr || error.message || 'Unknown error';
+  } catch (error: unknown) {
+    const err = error as { stdout?: string; stderr?: string; message?: string };
+    const output = err.stdout || err.stderr || err.message || 'Unknown error';
     logDebug(`Test command failed: ${output}`);
     return { success: false, output };
   }
